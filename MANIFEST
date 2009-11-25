@@ -15,4 +15,6 @@ MANIFEST			This list of files
 META.yml
 README
 t/00-load.t
+t/01-basic.t
+t/pageset.t
 t/simple.t
