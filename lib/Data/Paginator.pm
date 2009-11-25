@@ -105,8 +105,21 @@ sub next_page {
     $self->current_page < $self->last_page ? $self->current_page + 1 : undef;
 }
 
+sub page_for {
+    my ($self, $num) = @_;
+
+    return undef if $num > $self->total_entries || $num < 1;
+
+    my $page = $num / $self->entries_per_page;
+    if($page > int($page)) {
+        return int($page) + 1;
+    }
+
+    return $page;
+}
+
 sub previous_page {
-    my $self = shift;
+    my ($self) = @_;
 
     if ($self->current_page > 1) {
         return $self->current_page - 1;
@@ -205,6 +218,11 @@ Returns the number of the last entry on the current page.
 
 Returns the page number of the next page if one exists, otherwise returns
 false.
+
+=head2 page_for ($count)
+
+Returns the page number that the $count item appears on.  Returns undef if
+$count is outside the bounds of this Paginator.
 
 =head2 previous_page
 
