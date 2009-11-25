@@ -11,10 +11,8 @@ inc/Module/Install/WriteAll.pm
 lib/Data/Paginator.pm
 lib/Data/Paginator/Types.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 META.yml
 README
 t/00-load.t
-t/pod-coverage.t
-t/pod.t
 t/simple.t
