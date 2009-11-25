@@ -38,5 +38,4 @@ use Data::Paginator;
     cmp_ok($pager->current_page, '==', 6, '111 current_page yields 6');
 }
 
-
 done_testing;
