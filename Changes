@@ -1,5 +1,9 @@
 Revision history for Data-Paginator
 
+0.02    November 25th, 2009
+  * Make current_page more lenient, adjusting invalid values to valid ones.
+
+
 0.01    November 25th, 2009
         First version, released on an unsuspecting world.
 

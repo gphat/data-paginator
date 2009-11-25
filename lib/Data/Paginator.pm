@@ -3,11 +3,11 @@ use Moose;
 
 use Data::Paginator::Types qw(PositiveInt);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has current_page => (
     is => 'ro',
-    isa => PositiveInt,
+    isa => 'Num',
     default => 1
 );
 
@@ -28,6 +28,25 @@ has total_entries => (
     isa => PositiveInt,
     required => 1
 );
+
+# This facilitates incorrect page numbers.
+around 'current_page' => sub {
+    my ($orig, $self) = @_;
+
+    my $val = $self->meta->get_attribute('current_page')->get_value($self);
+    if(!defined($val)) {
+        $self->meta->get_attribute('current_page')->set_value($self, 1);
+        return 1
+    } elsif($val < 1) {
+        $self->meta->get_attribute('current_page')->set_value($self, 1);
+        return 1;
+    } elsif($val > $self->last_page) {
+        $self->meta->get_attribute('current_page')->set_value($self, $self->last_page);
+        return $self->last_page;
+    }
+
+    return $val;
+};
 
 sub _build_last_page {
     my $self = shift;
@@ -146,7 +165,10 @@ copy of Data::Page, lifting code from some of it's methods.
 
 =head2 current_page
 
-The current page.  Defaults to 1.
+The current page.  Defaults to 1.  If you set this value to to a page number
+lesser than or greater than the range of the pager, then 1 or the last_page
+will be returned instead.  It is safe to pass this numbers like -1000 or 1000
+when there are only 3 pages.
 
 =head2 entries_per_page
 
