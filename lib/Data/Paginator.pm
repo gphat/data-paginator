@@ -66,6 +66,7 @@ sub first {
 }
 
 sub first_page {
+    my ($self) = shift;
     return 1;
 }
 
@@ -136,9 +137,10 @@ Data::Paginator - Pagination with Moose
 
 This is yet another pagination module.  It only exists because none of the
 other pager modules are written using Moose.  Sometimes there is a Moose
-feature – MooseX::Storage, in my case – that you need and it's a pain when
+feature – MooseX::Storage, in my case – that you need. It's a pain when
 you can't use it with an existing module.  This module aims to be completely
-compatible with the venerable L<Data::Page>.
+compatible with the venerable L<Data::Page>.  In fact, it's a pretty blatant
+copy of Data::Page, lifting code from some of it's methods.
 
 =head1 ATTRIBUTES
 
@@ -196,8 +198,6 @@ clauses. It is simply $page->first - 1:
 
 Takes in an arrayref and returns only the valies which are on the current
 page.
-
-
 
 =head1 AUTHOR
 

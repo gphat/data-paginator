@@ -6,7 +6,7 @@ use MooseX::Types -declare => [qw(
 use MooseX::Types::Moose qw(Int);
 
 subtype PositiveInt,
-    as Int
+    as Int,
     where { $_ >= 0 },
     message { 'Number is not equal to or larger than 0' };
 
