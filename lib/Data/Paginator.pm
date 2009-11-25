@@ -246,6 +246,14 @@ you can't use it with an existing module.  This module aims to be completely
 compatible with the venerable L<Data::Page>.  In fact, it's a pretty blatant
 copy of Data::Page, lifting code from some of it's methods.
 
+=head1 SETS
+
+This module provides behavior compatible with L<Data::PageSet>, allowing you
+to break your pagination into sets.  For example, if you have a large number
+of pages to show and would like to allow the user to 'jump' X pages at a time,
+you can set the C<pages_per_set> attribute to X and populate the links in your
+pagination control with the values from C<previous_set> and C<next_set>.
+
 =head1 ATTRIBUTES
 
 =head2 current_page
