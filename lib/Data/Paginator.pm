@@ -4,7 +4,7 @@ use Moose;
 use Data::Paginator::Types qw(PositiveInt);
 use MooseX::Types::Moose qw(Maybe);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has current_page => (
     is => 'ro',
@@ -58,7 +58,7 @@ has total_entries => (
 around 'current_page' => sub {
     my ($orig, $self) = @_;
 
-    my $val = $self->meta->get_attribute('current_page')->get_value($self);
+    my $val = $self->meta->find_attribute_by_name('current_page')->get_value($self);
     if(!defined($val)) {
         $self->meta->get_attribute('current_page')->set_value($self, 1);
         return 1
@@ -191,6 +191,8 @@ sub previous_page {
 
 sub set_for {
     my ($self, $num) = @_;
+
+    return undef unless $self->has_pages_per_set;
 
     my $set = $num / $self->pages_per_set;
     if(int($set) != $set) {
