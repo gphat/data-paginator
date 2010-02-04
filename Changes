@@ -1,5 +1,8 @@
 Revision history for Data-Paginator
 
+0.04
+  * Document pages_per_set attribute.
+
 0.03
   * Fix problem that prevented subclassing Data::Paginator
   * Prevent division by zero when calling set_for with no pages_per_set set

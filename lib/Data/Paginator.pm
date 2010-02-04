@@ -4,7 +4,7 @@ use Moose;
 use Data::Paginator::Types qw(PositiveInt);
 use MooseX::Types::Moose qw(Maybe);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has current_page => (
     is => 'ro',
@@ -272,6 +272,13 @@ The number of entries per page, required at instantiation.
 =head2 last_page
 
 Returns the number of the last page.  Lazily computed, so do not set.
+
+=head2 pages_per_set
+
+If you have a large number of pages to show and would like to allow the user
+to 'jump' X pages at a time, you can set the C<pages_per_set> attribute to X
+and populate the links in your pagination control with the values from
+C<previous_set> and C<next_set>.
 
 =head2 total_entries
 
