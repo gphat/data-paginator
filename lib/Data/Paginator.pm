@@ -4,7 +4,7 @@ use Moose;
 use Data::Paginator::Types qw(PositiveInt);
 use MooseX::Types::Moose qw(Maybe);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has current_page => (
     is => 'ro',
@@ -349,7 +349,7 @@ clauses. It is simply $page->first - 1:
 
 =head2 splice
 
-Takes in an arrayref and returns only the valies which are on the current
+Takes in an arrayref and returns only the values which are on the current
 page.
 
 =head1 AUTHOR

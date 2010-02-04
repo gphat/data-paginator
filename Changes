@@ -1,5 +1,8 @@
 Revision history for Data-Paginator
 
+0.05
+  * Fix POD typo
+
 0.04
   * Document pages_per_set attribute.
 
