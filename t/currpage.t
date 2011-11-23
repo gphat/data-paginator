@@ -9,3 +9,7 @@ my $pager = Data::Paginator->new({
 });
 
 $pager->current_page(12);
+
+cmp_ok($pager->current_page, '==', 1);
+
+done_testing;
