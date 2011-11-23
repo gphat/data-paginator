@@ -1,10 +1,55 @@
 package Data::Paginator;
 use Moose;
 
+# ABSTRACT: Pagination with Moose
+
 use Data::Paginator::Types qw(PositiveInt);
 use MooseX::Types::Moose qw(Maybe);
 
-our $VERSION = '0.05';
+=head1 SYNOPSIS
+
+    use Data::Paginator;
+
+    my $pager = Data::Paginator->new(
+        current_page => 1,
+        entries_per_page => 10
+        total_entries => 100,
+    );
+
+    print "First page: ".$page->first_page."\n";
+    print "Last page: ".$page->last_page."\n";
+    print "First entry on page: ".$page->first."\n";
+    print "Last entry on page: ".$page->last."\n";
+
+=head1 DESCRIPTION
+
+This is yet another pagination module.  It only exists because none of the
+other pager modules are written using Moose.  Sometimes there is a Moose
+feature – MooseX::Storage, in my case – that you need. It's a pain when
+you can't use it with an existing module.  This module aims to be completely
+compatible with the venerable L<Data::Page>.  In fact, it's a pretty blatant
+copy of Data::Page, lifting code from some of it's methods.
+
+=begin: prelude
+
+=head1 SETS
+
+This module provides behavior compatible with L<Data::PageSet>, allowing you
+to break your pagination into sets.  For example, if you have a large number
+of pages to show and would like to allow the user to 'jump' X pages at a time,
+you can set the C<pages_per_set> attribute to X and populate the links in your
+pagination control with the values from C<previous_set> and C<next_set>.
+
+=end :postlude
+
+=attr current_page
+
+The current page.  Defaults to 1.  If you set this value to to a page number
+lesser than or greater than the range of the pager, then 1 or the last_page
+will be returned instead.  It is safe to pass this numbers like -1000 or 1000
+when there are only 3 pages.
+
+=cut
 
 has current_page => (
     is => 'ro',
@@ -18,11 +63,23 @@ has current_set => (
     lazy_build => 1
 );
 
+=attr entries_per_page
+
+The number of entries per page, required at instantiation.
+
+=cut
+
 has entries_per_page => (
     is => 'ro',
     isa => PositiveInt,
     required => 1
 );
+
+=attr last_page
+
+Returns the number of the last page.  Lazily computed, so do not set.
+
+=cut
 
 has last_page => (
     is => 'ro',
@@ -30,11 +87,26 @@ has last_page => (
     lazy_build => 1
 );
 
+=attr next_set
+
+Returns the number of the next set or undefined if there is no next.
+
+=cut
+
 has next_set => (
     is => 'ro',
     isa => Maybe[PositiveInt],
     lazy_build => 1
 );
+
+=attr pages_per_set
+
+If you have a large number of pages to show and would like to allow the user
+to 'jump' X pages at a time, you can set the C<pages_per_set> attribute to X
+and populate the links in your pagination control with the values from
+C<previous_set> and C<next_set>.
+
+=cut
 
 has pages_per_set => (
     is => 'ro',
@@ -42,11 +114,25 @@ has pages_per_set => (
     predicate => 'has_pages_per_set'
 );
 
+=attr previous_set
+
+Returns the set number of the previous set or undefined if there is no
+previous set.
+
+=cut
+
 has previous_set => (
     is => 'ro',
     isa => Maybe[PositiveInt],
     lazy_build => 1
 );
+
+=attr total_entries
+
+The total number of entries this pager is covering.  Required at
+instantiation.
+
+=cut
 
 has total_entries => (
     is => 'ro',
@@ -58,15 +144,16 @@ has total_entries => (
 around 'current_page' => sub {
     my ($orig, $self) = @_;
 
-    my $val = $self->meta->find_attribute_by_name('current_page')->get_value($self);
+    my $attr = $self->meta->find_attribute_by_name('current_page');
+    my $val = $attr->get_value($self);
     if(!defined($val)) {
-        $self->meta->get_attribute('current_page')->set_value($self, 1);
+        $attr->set_value($self, 1);
         return 1
     } elsif($val < 1) {
-        $self->meta->get_attribute('current_page')->set_value($self, 1);
+        $attr->set_value($self, 1);
         return 1;
     } elsif($val > $self->last_page) {
-        $self->meta->get_attribute('current_page')->set_value($self, $self->last_page);
+        $attr->set_value($self, $self->last_page);
         return $self->last_page;
     }
 
@@ -115,6 +202,12 @@ sub _build_previous_set {
     return ($cset - 2) * $self->pages_per_set * $self->entries_per_page + 1;
 }
 
+=method entries_on_this_page
+
+Returns the number of entries on this page.
+
+=cut
+
 sub entries_on_this_page {
     my ($self) = @_;
 
@@ -124,6 +217,12 @@ sub entries_on_this_page {
         return $self->last - $self->first + 1;
     }
 }
+
+=attr first
+
+Returns the number of the first entry on the current page.
+
+=cut
 
 sub first {
     my ($self) = @_;
@@ -135,10 +234,22 @@ sub first {
     }
 }
 
+=attr first_page
+
+Always returns 1.
+
+=cut
+
 sub first_page {
     my ($self) = @_;
     return 1;
 }
+
+=method first_set
+
+Returns 1 if this Paginator has pages_per_set.  Otherwise returns undef.
+
+=cut
 
 sub first_set {
     my ($self) = @_;
@@ -150,6 +261,12 @@ sub first_set {
     return undef;
 }
 
+=method last
+
+Returns the number of the last entry on the current page.
+
+=cut
+
 sub last {
     my $self = shift;
 
@@ -160,11 +277,25 @@ sub last {
     }
 }
 
+=method next_page
+
+Returns the page number of the next page if one exists, otherwise returns
+false.
+
+=cut
+
 sub next_page {
     my $self = shift;
 
     $self->current_page < $self->last_page ? $self->current_page + 1 : undef;
 }
+
+=method page_for ($count)
+
+Returns the page number that the $count item appears on.  Returns undef if
+$count is outside the bounds of this Paginator.
+
+=cut
 
 sub page_for {
     my ($self, $num) = @_;
@@ -179,6 +310,13 @@ sub page_for {
     return $page;
 }
 
+=method previous_page
+
+Returns the page number of the previous page if one exists, otherwise returns
+undef.
+
+=cut
+
 sub previous_page {
     my ($self) = @_;
 
@@ -188,6 +326,13 @@ sub previous_page {
         return undef;
     }
 }
+
+=method set_for $page
+
+Returns the set number of the specified page.  Returns undef if the page
+exceeds the bounds of the Paginator.
+
+=cut
 
 sub set_for {
     my ($self, $num) = @_;
@@ -210,6 +355,13 @@ sub skipped {
     return $skipped;
 }
 
+=method splice
+
+Takes in an arrayref and returns only the values which are on the current
+page.
+
+=cut
+
 sub splice {
     my ($self, $array) = @_;
 
@@ -218,154 +370,14 @@ sub splice {
     return @{$array}[ $self->first - 1 .. $top - 1 ];
 }
 
-1;
-
-=head1 NAME
-
-Data::Paginator - Pagination with Moose
-
-=head1 SYNOPSIS
-
-    use Data::Paginator;
-
-    my $pager = Data::Paginator->new(
-        current_page => 1,
-        entries_per_page => 10
-        total_entries => 100,
-    );
-
-    print "First page: ".$page->first_page."\n";
-    print "Last page: ".$page->last_page."\n";
-    print "First entry on page: ".$page->first."\n";
-    print "Last entry on page: ".$page->last."\n";
-
-=head1 DESCRIPTION
-
-This is yet another pagination module.  It only exists because none of the
-other pager modules are written using Moose.  Sometimes there is a Moose
-feature – MooseX::Storage, in my case – that you need. It's a pain when
-you can't use it with an existing module.  This module aims to be completely
-compatible with the venerable L<Data::Page>.  In fact, it's a pretty blatant
-copy of Data::Page, lifting code from some of it's methods.
-
-=head1 SETS
-
-This module provides behavior compatible with L<Data::PageSet>, allowing you
-to break your pagination into sets.  For example, if you have a large number
-of pages to show and would like to allow the user to 'jump' X pages at a time,
-you can set the C<pages_per_set> attribute to X and populate the links in your
-pagination control with the values from C<previous_set> and C<next_set>.
-
-=head1 ATTRIBUTES
-
-=head2 current_page
-
-The current page.  Defaults to 1.  If you set this value to to a page number
-lesser than or greater than the range of the pager, then 1 or the last_page
-will be returned instead.  It is safe to pass this numbers like -1000 or 1000
-when there are only 3 pages.
-
-=head2 entries_per_page
-
-The number of entries per page, required at instantiation.
-
-=head2 last_page
-
-Returns the number of the last page.  Lazily computed, so do not set.
-
-=head2 pages_per_set
-
-If you have a large number of pages to show and would like to allow the user
-to 'jump' X pages at a time, you can set the C<pages_per_set> attribute to X
-and populate the links in your pagination control with the values from
-C<previous_set> and C<next_set>.
-
-=head2 total_entries
-
-The total number of entries this pager is covering.  Required at
-instantiation.
-
-=head1 METHODS
-
-=head2 entries_on_this_page
-
-Returns the number of entries on this page.
-
-=head2 first
-
-Returns the number of the first entry on the current page.
-
-=head2 first_page
-
-Always returns 1.
-
-=head2 first_set
-
-Returns 1 if this Paginator has pages_per_set.  Otherwise returns undef.
-
-=head2 last
-
-Returns the number of the last entry on the current page.
-
-=head2 last_set
-
-Returns the number of the last set if this Paginator has pages_per_set.
-Otherwise returns undef.
-
-
-=head2 next_page
-
-Returns the page number of the next page if one exists, otherwise returns
-false.
-
-=head2 next_set
-
-Returns the number of the next set or undefined if there is no next.
-
-=head2 page_for ($count)
-
-Returns the page number that the $count item appears on.  Returns undef if
-$count is outside the bounds of this Paginator.
-
-=head2 previous_page
-
-Returns the page number of the previous page if one exists, otherwise returns
-undef.
-
-=head2 previous_set
-
-Returns the set number of the previous set or undefined if there is no
-previous set.
-
-=head2 set_for $page
-
-Returns the set number of the specified page.  Returns undef if the page
-exceeds the bounds of the Paginator.
-
-=head2 skip
-
-This method is useful paging through data in a database using SQL LIMIT
-clauses. It is simply $page->first - 1:
-
-=head2 splice
-
-Takes in an arrayref and returns only the values which are on the current
-page.
-
-=head1 AUTHOR
-
-Cory G Watson, C<< <gphat at cpan.org> >>
+=begin :postlude
 
 =head1 ACKNOWLEDGEMENTS
 
 Léon Brocard and his work on L<Data::Page>.
 
-=head1 COPYRIGHT & LICENSE
+=end :postlude
 
-Copyright 2009 Cory G Watson.
+=cut
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See http://dev.perl.org/licenses/ for more information.
+1;

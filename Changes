@@ -1,5 +1,8 @@
 Revision history for Data-Paginator
 
+{{$NEXT}}
+  * Fix bug that threw exceptions on empty pagination.
+
 0.05
   * Fix POD typo
 
