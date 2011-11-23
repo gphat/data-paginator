@@ -1,6 +1,7 @@
 Revision history for Data-Paginator
 
 {{$NEXT}}
+  * Convert to Dist::Zilla
   * Fix bug that threw exceptions on empty pagination.
 
 0.05
