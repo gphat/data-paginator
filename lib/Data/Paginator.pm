@@ -12,7 +12,7 @@ use MooseX::Types::Moose qw(Maybe);
 
     my $pager = Data::Paginator->new(
         current_page => 1,
-        entries_per_page => 10
+        entries_per_page => 10,
         total_entries => 100,
     );
 
