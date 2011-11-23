@@ -40,7 +40,7 @@ of pages to show and would like to allow the user to 'jump' X pages at a time,
 you can set the C<pages_per_set> attribute to X and populate the links in your
 pagination control with the values from C<previous_set> and C<next_set>.
 
-=end :postlude
+=end :prelude
 
 =attr current_page
 
