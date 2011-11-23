@@ -30,7 +30,7 @@ you can't use it with an existing module.  This module aims to be completely
 compatible with the venerable L<Data::Page>.  In fact, it's a pretty blatant
 copy of Data::Page, lifting code from some of it's methods.
 
-=begin: prelude
+=begin :prelude
 
 =head1 SETS
 
