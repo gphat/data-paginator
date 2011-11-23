@@ -16,10 +16,10 @@ use MooseX::Types::Moose qw(Maybe);
         total_entries => 100,
     );
 
-    print "First page: ".$page->first_page."\n";
-    print "Last page: ".$page->last_page."\n";
-    print "First entry on page: ".$page->first."\n";
-    print "Last entry on page: ".$page->last."\n";
+    print "First page: ".$pager->first_page."\n";
+    print "Last page: ".$pager->last_page."\n";
+    print "First entry on page: ".$pager->first."\n";
+    print "Last entry on page: ".$pager->last."\n";
 
 =head1 DESCRIPTION
 
