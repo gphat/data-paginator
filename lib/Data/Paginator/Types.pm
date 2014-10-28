@@ -5,6 +5,8 @@ use MooseX::Types -declare => [qw(
 
 use MooseX::Types::Moose qw(Int);
 
+# ABSTRACT: Defines types used by Data::Paginator
+
 subtype PositiveInt,
     as Int,
     where { $_ >= 0 },
